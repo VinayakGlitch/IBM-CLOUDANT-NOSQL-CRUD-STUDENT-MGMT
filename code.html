@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    {% if page=='home' %}Welcome
+    {% elif page=='signin' %}Sign Up
+    {% elif page=='login' %}Login
+    {% elif page=='edit' %}Edit Task
+    {% else %}Dashboard{% endif %}
+  </title>
+
+  <!-- GOOGLE FONT + CORE STYLES -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<script>
+/* theme persistence */
+(() => {
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.body.classList.toggle('light', theme === 'light');
+})();
+function toggleTheme () {
+  const light = document.body.classList.toggle('light');
+  localStorage.setItem('theme', light ? 'light' : 'dark');
+}
+</script>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar">
+  <div class="navbar-left">🌥️ CloudTask</div>
+  <div class="navbar-right">
+    {% if not session.get('username') %}
+      <a href="/signin" class="btn small">Sign&nbsp;Up</a>
+      <a href="/login"  class="btn small">Login</a>
+    {% else %}
+      <a href="/logout" class="btn small">Logout</a>
+    {% endif %}
+    <button class="icon" aria-label="Toggle Theme" onclick="toggleTheme()">🌓</button>
+  </div>
+</nav>
+
+<div class="container">
+
+{% if page=='home' %}
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <h1>IBM Cloud Task Manager</h1>
+    <p class="tagline">Organize your day, the smart cloud way.</p>
+  </section>
+
+{% elif page=='signin' %}
+  <!-- ─── SIGN UP ─── -->
+  <form class="box auth"  method="POST">
+    <h2>Create Account</h2>
+    <input name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button class="btn full">Sign Up</button>
+    <p class="small">Already have an account? <a href="/login">Login</a></p>
+  </form>
+
+{% elif page=='login' %}
+  <!-- ─── LOGIN ─── -->
+  <form class="box auth"  method="POST">
+    <h2>Login</h2>
+    <input name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button class="btn full">Login</button>
+    <p class="small">New user? <a href="/signin">Sign Up</a></p>
+  </form>
+
+{% elif page=='edit' %}
+  <!-- ─── EDIT TASK ─── -->
+  <form class="box"  method="POST" action="/update/{{ doc['_id'] }}">
+    <h2>Edit Task</h2>
+    <input  name="task" value="{{ doc.task }}" required>
+    <textarea name="description" rows="4"
+              placeholder="Description…">{{ doc.get('description','') }}</textarea>
+
+    <div class="actions">
+      <button class="btn">Update</button>
+      <a  class="btn danger" href="/dashboard">Cancel</a>
+    </div>
+  </form>
+
+{% else %}
+  <!-- ─── DASHBOARD ─── -->
+  <header class="top">
+    <span>Hello, <strong>{{ session.username }}</strong></span>
+  </header>
+
+  <form class="box" method="POST" action="/add">
+    <h2>New Task</h2>
+    <input  name="task" placeholder="Title…" required>
+    <textarea name="description" rows="3" placeholder="Description…"></textarea>
+    <button class="btn full">Add Task</button>
+  </form>
+
+  <ul class="tasks">
+  {% for task in tasks %}
+    {% set done = task.get('completed', False) %}
+    <li class="{{ 'done' if done }}">
+      <div>
+        <strong>{{ task.task }}</strong>
+        {% if task.description %}<div class="desc">{{ task.description }}</div>{% endif %}
+      </div>
+      <div class="task-actions">
+        {% if not done %}<a href="/complete/{{ task['_id'] }}">✔️</a>{% endif %}
+        <a href="/edit/{{ task['_id'] }}">✏️</a>
+        <a href="/delete/{{ task['_id'] }}">🗑</a>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+
+  <a class="btn danger clear" href="/clear_completed">Clear Completed</a>
+{% endif %}
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <small>© 2025 Cloud-Powered Task Manager. All rights reserved.</small>
+</footer>
+
+
+</body>
+</html>
