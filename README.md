@@ -48,5 +48,4 @@ This app is deployed using Render with:
 
 4.IBM Cloudant connection via .env
 
-👑 Author
 Built with 💖 by Vinayak Rastogi
