@@ -25,7 +25,6 @@ Supports full **CRUD** operations with a clean, modern UI, **dark mode**, and de
 | **Frontend**| HTML, CSS, JavaScript             |
 | **Backend** | Python (Flask)                    |
 | **Database**| IBM Cloudant NoSQL DB             |
-| **Hosting** | Render (Free Cloud Deployment)    |
 
 ---
 
